@@ -1,11 +1,12 @@
 import { KonvaEventObject } from 'konva/types/Node';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Layer, Stage } from 'react-konva';
 import './App.css';
 import { fromCenter } from './helperFunctions';
 import { Circle } from './shapes/Circle';
 import { Polygon } from './shapes/Polygon';
 import { Rectangle } from './shapes/Rectangle';
+import { Toolbox } from './Toolbox';
 
 
 const Component = ({ type, data, props }: ComponentType<RectangleType | PolygonType | CircleType>) => {
@@ -22,6 +23,11 @@ const Component = ({ type, data, props }: ComponentType<RectangleType | PolygonT
 }
 
 function App() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState(0);
+  const [width, setWidth] = useState(0);
+  const [image, setImage] = useState<string | null>(localStorage.getItem('image'));
+
   const [shapes, setShapes] = useState<AnyShapeType[]>([{
     type: 'polygon',
     id: 'test',
@@ -59,6 +65,16 @@ function App() {
   }]);
   const [selectedId, setSelected] = useState<string | null>(null);
 
+  useEffect(() => {
+    setHeight(ref?.current?.clientHeight ?? 0);
+    setWidth(ref?.current?.clientWidth ?? 0);
+  }, [ref]);
+
+  useEffect(() => {
+    if(image) localStorage.setItem('image', image);
+    else localStorage.removeItem('image');
+  }, [image])
+
   const checkDeselect = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
     // deselect when clicked on empty area
     const clickedOnEmpty = e.target === e.target.getStage();
@@ -82,12 +98,15 @@ function App() {
       }
     }])
   }
-  return (
 
-    <Stage width={window.innerWidth} height={window.innerHeight}
+ 
+  return (<div className="main-container" ref={ref}>
+    <Toolbox onImageChange={setImage} />
+    {image && <img src={image} />}
+    <Stage width={width} height={height}
       onMouseDown={checkDeselect}
       onTouchStart={checkDeselect}
-    // onDblClick={addComponent}
+      onDblClick={addComponent}
     >
       <Layer>
         {shapes.map((x, i) => <Component key={x.data.id}
@@ -105,6 +124,7 @@ function App() {
         />)}
       </Layer>
     </Stage>
+  </div>
   );
 }
 

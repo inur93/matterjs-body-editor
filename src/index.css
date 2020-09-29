@@ -11,3 +11,31 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.toolbox {
+  position: absolute;
+  height: 450px;
+  width: 100px;
+  z-index: 1000;
+}
+
+.toolbox-button-wrapper {
+  position: relative;
+  padding-bottom: 100%;
+}
+
+.toolbox-button-wrapper .toolbox-button {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.main-container {
+  margin: 1rem;
+  height: calc(99vh - 2rem);
+  width: calc(99vw - 2rem);
+
+  border: 1px solid black;
+}

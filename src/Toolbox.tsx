@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
-import { Card } from "@material-ui/core"
+import { Button, Card } from "@material-ui/core"
 import { useState } from 'react';
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
-import { Circle, Square, Triangle, MousePointer } from './icons/Icons';
+import { Circle, Square, Triangle, MousePointer, ImageUpload } from './icons/Icons';
+import { JsxAttribute } from 'typescript';
 
 const settingsKey = 'toolboxSettings';
 const readSettings = () => {
@@ -14,7 +15,7 @@ const readSettings = () => {
     }
 }
 
-export const Toolbox = () => {
+export const Toolbox = ({ onImageChange }: ToolboxProps) => {
     const savedSettings: ToolboxSettings = readSettings();
     const [offsetX, setOffsetX] = useState(0);
     const [offsetY, setOffsetY] = useState(0);
@@ -51,10 +52,12 @@ export const Toolbox = () => {
     const handleShapeSelect = (evt: React.MouseEvent<HTMLElement>, value: 'square' | 'polygon' | 'circle') => {
         setShape(value);
     }
-    return (<Card style={{
-        position: 'absolute',
-        height: 200,
-        width: 50,
+
+    const uploadImage = (data: any) => {
+        debugger;
+        onImageChange(data);
+    }
+    return (<Card className="toolbox" style={{
         top: y,
         left: x
     }}
@@ -75,9 +78,52 @@ export const Toolbox = () => {
             <ToggleButton value="circle">
                 <Circle />
             </ToggleButton>
-            <ToggleButton value="select">
-                <MousePointer />
-            </ToggleButton>
+            <ToolboxUploadButton onFileChange={uploadImage}>
+                <ImageUpload />
+            </ToolboxUploadButton>
         </ToggleButtonGroup>
     </Card>)
+}
+
+const ToolboxButton = (props: ToolboxButtonProps) => {
+    return <div className="toolbox-button-wrapper">
+        <Button className="toolbox-button" component="span">
+            {props.children}
+        </Button>
+    </div >
+}
+
+const ToolboxUploadButton = ({ children, onFileChange }: ToolboxUploadButtonProps) => {
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        event.preventDefault();
+        const files = event?.target?.files;
+        const file = files?.length ? files[0] : null;
+        onFileChange(file && URL.createObjectURL(file));
+    }
+    return <label htmlFor="upload-image">
+        <input style={{ display: 'none' }}
+            id="upload-image"
+            name="upload-image"
+            type="file"
+            onChange={handleChange} />
+        <div className="toolbox-button-wrapper">
+            <Button className="toolbox-button" component="span">
+                {children}
+            </Button>
+        </div >
+    </label>
+}
+
+type ToolboxButtonProps = {
+    // onClick: () => void,
+    children: JSX.Element
+}
+
+type ToolboxUploadButtonProps = {
+    onFileChange: (file: string | null) => void,
+    children: JSX.Element
+}
+
+type ToolboxProps = {
+    onImageChange: (img: string | null) => void
 }

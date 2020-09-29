@@ -1,5 +1,4 @@
 
-
 type ShapeOnChange<T> = (props: T) => void;
 
 interface ShapeType {

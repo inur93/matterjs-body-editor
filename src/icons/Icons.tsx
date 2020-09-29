@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Shape } from 'react-konva';
+import WallpaperIcon from '@material-ui/icons/Wallpaper';
 const strokeWidth = 8;
 
 export const Square = () => {
@@ -63,4 +63,8 @@ export const MousePointer = () => {
             <path d="M20 20 L180 80 L120 120 20 180 Z" strokeWidth={strokeWidth} stroke='black' fill="transparent" />
         </g>
     </svg>)
+}
+
+export const ImageUpload = () => {
+    return <WallpaperIcon style={{width: '100%', height: '100%'}} />
 }
