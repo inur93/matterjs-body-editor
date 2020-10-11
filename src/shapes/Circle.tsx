@@ -1,39 +1,49 @@
 
 import Konva from 'konva';
 import { KonvaEventObject } from 'konva/types/Node';
-import React, { useEffect, useState } from 'react';
-import { Circle as CircleKonva } from 'react-konva';
-import { Anchor } from '../components/Anchor';
+import React, { useEffect } from 'react';
+import { Ellipse as EllipseKonva, Transformer } from 'react-konva';
+import { useShapeColor } from '../hooks/useShapeColor';
 
-//https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
-const dist = (p1: Vector, p2: Vector, d: Vector) => {
-    return Math.abs((p2.y - p1.y) * d.x - (p2.x - p1.x) * d.y + p2.x * p1.y - p2.y * p1.x)
-        / Math.sqrt(Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2))
-}
-
-
-const handleShapeMove = (onChange: ShapeOnChange<CircleType>, props: CircleType) => (e: KonvaEventObject<Event>) => {
-    onChange({
-        ...props,
-        x: e.target.x(),
-        y: e.target.y()
-    })
-}
-
-const handleAnchorChange = (onChange: ShapeOnChange<CircleType>, props: CircleType) =>
-    (position: Vector) => {
-        const { y } = props;
-
-        let r = Math.abs(y - position.y) - 5;
-        if (r < 10) r = 10;
-
-        onChange({ ...props, r: r });
+const handleShapeMove = (onChange: MBE.ShapeOnChange<MBE.Circle>,
+    data: MBE.Circle) => (e: KonvaEventObject<Event>) => {
+        onChange({
+            ...data,
+            x: e.target.x(),
+            y: e.target.y()
+        })
     }
 
-export const Circle = (props: CircleProps) => {
-    const shapeRef = React.useRef<Konva.Circle>() as React.MutableRefObject<Konva.Circle>;
+const handleTransformEnd = (ref: React.MutableRefObject<Konva.Ellipse>,
+    onChange: MBE.ShapeOnChange<MBE.Circle>,
+    data: MBE.Circle) =>
+    (e: KonvaEventObject<Event>) => {
+        // transformer is changing scale of the node
+        // and NOT its width or height
+        // but in the store we have only width and height
+        // to match the data better we will reset scale on transform end
+        const node = ref.current;
+        const scaleX = node.scaleX();
+        const scaleY = node.scaleY();
+
+        // we will reset it back
+        node.scaleX(1);
+        node.scaleY(1);
+        onChange({
+            ...data,
+            x: node.x(),
+            y: node.y(),
+            angle: node.rotation(),
+            rX: node.radiusX() * scaleX,
+            rY: node.radiusY() * scaleY
+        });
+    }
+
+export const Circle = (props: MBE.CircleProps) => {
+    const shapeRef = React.useRef<Konva.Ellipse>() as React.MutableRefObject<Konva.Ellipse>;
     const trRef = React.useRef<Konva.Transformer>() as React.MutableRefObject<Konva.Transformer>;
-    const { r, x, y } = props.data;
+    const [color] = useShapeColor();
+    const { rX, rY, x, y } = props.data;
     useEffect(() => {
         if (props.isSelected) {
             trRef.current?.setNode(shapeRef.current);
@@ -43,26 +53,38 @@ export const Circle = (props: CircleProps) => {
 
     return <React.Fragment>
 
-        <CircleKonva
+        <EllipseKonva
             draggable
-            stroke="black"
+            stroke={color}
             strokeWidth={2}
             x={x}
             y={y}
-            radius={r}
+            radiusX={rX}
+            radiusY={rY}
             ref={shapeRef}
-
-            onDragMove={handleShapeMove(props.onChange, props.data)}
             onDragEnd={handleShapeMove(props.onChange, props.data)}
             onClick={() => props.onSelect(props.data.id)}
+            onTransformEnd={handleTransformEnd(shapeRef, props.onChange, props.data)}
         />
-        {props.isSelected && <Anchor
-            id={`${props.data.id}-radius`}
-            x={x}
-            y={y - r}
-            labelText={`r=${r}`}
-            onDrag={handleAnchorChange(props.onChange, props.data)}
-        />
-        }
+
+        <Transformer ref={trRef} rotateEnabled={false}
+            enabledAnchors={[
+                'top-left',
+                'top-right',
+                'bottom-left',
+                'bottom-right'
+            ]} />
     </React.Fragment>
+}
+
+Circle.create = (id: string, x: number, y: number): MBE.Circle => {
+    return {
+        type: 'circle',
+        angle: 0,
+        id,
+        x,
+        y,
+        rX: 50,
+        rY: 50
+    }
 }

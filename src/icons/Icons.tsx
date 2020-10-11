@@ -1,6 +1,7 @@
 
 import React from 'react';
 import WallpaperIcon from '@material-ui/icons/Wallpaper';
+import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
 const strokeWidth = 8;
 
 export const Square = () => {
@@ -67,4 +68,8 @@ export const MousePointer = () => {
 
 export const ImageUpload = () => {
     return <WallpaperIcon style={{width: '100%', height: '100%'}} />
+}
+
+export const Hand = () => {
+    return <PanToolOutlinedIcon style={{width: '100%', height: '100%'}} />
 }

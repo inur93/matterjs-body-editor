@@ -16,12 +16,12 @@ code {
   position: absolute;
   height: 450px;
   width: 100px;
-  z-index: 1000;
+  z-index: 1050;
 }
 
 .toolbox-button-wrapper {
   position: relative;
-  padding-bottom: 100%;
+  /* padding-bottom: 100%; */
 }
 
 .toolbox-button-wrapper .toolbox-button {
@@ -33,9 +33,18 @@ code {
 }
 
 .main-container {
-  margin: 1rem;
-  height: calc(99vh - 2rem);
-  width: calc(99vw - 2rem);
-
+  position: relative;
+  z-index: 1031;
+  overflow: hidden;
   border: 1px solid black;
+}
+
+.backdrop {
+  position: absolute;
+  z-index: 1032;
+}
+
+.canvas {
+  z-index: 1033;
+  position: absolute;
 }

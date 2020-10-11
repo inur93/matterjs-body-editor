@@ -3,11 +3,13 @@ import Konva from 'konva';
 import { KonvaEventObject } from 'konva/types/Node';
 import React, { useEffect } from 'react';
 import { Rect, Transformer } from 'react-konva';
+import { useShapeColor } from '../hooks/useShapeColor';
+import { useScale, useViewport } from '../hooks/useScale';
 
 
 const handleTransformEnd = (ref: React.MutableRefObject<Konva.Rect>,
-    onChange: ShapeOnChange<RectangleType>,
-    shapeProps: RectangleType) =>
+    onChange: MBE.ShapeOnChange<MBE.Rectangle>,
+    data: MBE.Rectangle) =>
     (e: KonvaEventObject<Event>) => {
         // transformer is changing scale of the node
         // and NOT its width or height
@@ -21,7 +23,7 @@ const handleTransformEnd = (ref: React.MutableRefObject<Konva.Rect>,
         node.scaleX(1);
         node.scaleY(1);
         onChange({
-            ...shapeProps,
+            ...data,
             x: node.x(),
             y: node.y(),
             // set minimal value
@@ -30,17 +32,22 @@ const handleTransformEnd = (ref: React.MutableRefObject<Konva.Rect>,
         });
     }
 
-const handleDragEnd = (onChange: ShapeOnChange<RectangleType>, props: RectangleType) => (e: KonvaEventObject<Event>) => {
+const handleDragEnd = (onChange: MBE.ShapeOnChange<MBE.Rectangle>, data: MBE.Rectangle) => (e: KonvaEventObject<Event>) => {
     onChange({
-        ...props,
+        ...data,
         x: e.target.x(),
         y: e.target.y()
     })
 }
-export const Rectangle = (props: RectanglePropsType) => {
+export const Rectangle = (props: MBE.RectangleProps) => {
     const shapeRef = React.useRef<Konva.Rect>() as React.MutableRefObject<Konva.Rect>;
     const trRef = React.useRef<Konva.Transformer>() as React.MutableRefObject<Konva.Transformer>;
-    const { x, y, width, height } = props.data;
+    const [color] = useShapeColor();
+    const { width, height } = props.data;
+    const [viewport] = useViewport();
+
+    const x = props.data.x * viewport.scale.x + viewport.offset.x;
+    const y = props.data.y * viewport.scale.y + viewport.offset.y;
 
     useEffect(() => {
         if (props.isSelected) {
@@ -53,8 +60,9 @@ export const Rectangle = (props: RectanglePropsType) => {
 
         <Rect
             draggable
-            stroke="black"
+            stroke={color}
             strokeWidth={2}
+            scale={viewport.scale}
             ref={shapeRef}
             onClick={() => props.onSelect(props.data.id)}
             onTransformEnd={handleTransformEnd(shapeRef, props.onChange, props.data)}
@@ -72,4 +80,15 @@ export const Rectangle = (props: RectanglePropsType) => {
                 }}
             />}
     </React.Fragment>
+}
+
+Rectangle.create = (id: string, x: number, y: number): MBE.Rectangle => {
+    return {
+        type: 'rectangle',
+        id,
+        x,
+        y,
+        width: 50,
+        height: 50
+    }
 }

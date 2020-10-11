@@ -1,9 +1,16 @@
-import React, { useEffect } from 'react';
-import { Button, Card } from "@material-ui/core"
-import { useState } from 'react';
+import { Button, Card } from "@material-ui/core";
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
-import { Circle, Square, Triangle, MousePointer, ImageUpload } from './icons/Icons';
-import { JsxAttribute } from 'typescript';
+import React, { useEffect, useState } from 'react';
+import { ColorPicker } from "./components/ColorPicker";
+import { EventType } from './events/CustomEvent';
+import EventDispatcher from './events/EventDispatcher';
+import { ShapeSelectedEvent } from './events/ShapeSelectedEvent';
+import { image2obj } from "./helperFunctions";
+import { Circle, ImageUpload, Square } from './icons/Icons';
+import { ColorChangeEvent } from './events/ColorChangeEvent';
+import { ImageUploadButton, ImageUploadModal } from "./components/toolbox/ImageUpload";
+import { ShapeColorPicker } from "./components/toolbox/ShapeColorPicker";
+import { DragButton } from "./components/toolbox/DragButton";
 
 const settingsKey = 'toolboxSettings';
 const readSettings = () => {
@@ -15,15 +22,26 @@ const readSettings = () => {
     }
 }
 
-export const Toolbox = ({ onImageChange }: ToolboxProps) => {
+export const Toolbox = () => {
     const savedSettings: ToolboxSettings = readSettings();
     const [offsetX, setOffsetX] = useState(0);
     const [offsetY, setOffsetY] = useState(0);
     const [x, setX] = useState(savedSettings.x);
     const [y, setY] = useState(savedSettings.y);
     const [drag, setDrag] = useState(false);
-    const [shape, setShape] = useState("");
+    const [shape, setShape] = useState<MBE.Shape | undefined>(undefined);
 
+
+
+    useEffect(() => {
+        EventDispatcher.dispatch(new ShapeSelectedEvent(shape));
+    }, [shape])
+    useEffect(() => {
+        const listener = () => setShape(undefined);
+        EventDispatcher.subscribe(EventType.SHAPE_ADD, listener);
+
+        return () => EventDispatcher.unsubscribe(EventType.SHAPE_ADD, listener);
+    }, []);
     useEffect(() => {
         localStorage.setItem(settingsKey, JSON.stringify({
             x, y
@@ -32,8 +50,8 @@ export const Toolbox = ({ onImageChange }: ToolboxProps) => {
     const move = (e: React.MouseEvent<HTMLDivElement>) => {
         if (!drag) return;
         const evt = e;
-        let newX = evt.pageX - offsetX - 10;
-        let newY = evt.pageY - offsetY - 10;
+        let newX = evt.pageX - offsetX;
+        let newY = evt.pageY - offsetY;
         if (newX < 0) newX = 0;
         if (newY < 0) newY = 0;
         setX(newX);
@@ -49,14 +67,10 @@ export const Toolbox = ({ onImageChange }: ToolboxProps) => {
         setDrag(false);
     }
 
-    const handleShapeSelect = (evt: React.MouseEvent<HTMLElement>, value: 'square' | 'polygon' | 'circle') => {
+    const handleShapeSelect = (evt: React.MouseEvent<HTMLElement>, value: MBE.Shape) => {
         setShape(value);
     }
 
-    const uploadImage = (data: any) => {
-        debugger;
-        onImageChange(data);
-    }
     return (<Card className="toolbox" style={{
         top: y,
         left: x
@@ -65,65 +79,21 @@ export const Toolbox = ({ onImageChange }: ToolboxProps) => {
         onMouseMove={move}
         onMouseLeave={end}
         onMouseUp={end}>
+
+        <DragButton />
         <ToggleButtonGroup value={shape}
             exclusive
             orientation="vertical"
             onChange={handleShapeSelect}>
-            <ToggleButton value="square">
+            <ToggleButton value="rectangle">
                 <Square />
-            </ToggleButton>
-            <ToggleButton value="polygon">
-                <Triangle />
             </ToggleButton>
             <ToggleButton value="circle">
                 <Circle />
             </ToggleButton>
-            <ToolboxUploadButton onFileChange={uploadImage}>
-                <ImageUpload />
-            </ToolboxUploadButton>
+            <ImageUploadButton />
         </ToggleButtonGroup>
+        <ShapeColorPicker />
+        <ImageUploadModal />
     </Card>)
-}
-
-const ToolboxButton = (props: ToolboxButtonProps) => {
-    return <div className="toolbox-button-wrapper">
-        <Button className="toolbox-button" component="span">
-            {props.children}
-        </Button>
-    </div >
-}
-
-const ToolboxUploadButton = ({ children, onFileChange }: ToolboxUploadButtonProps) => {
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        event.preventDefault();
-        const files = event?.target?.files;
-        const file = files?.length ? files[0] : null;
-        onFileChange(file && URL.createObjectURL(file));
-    }
-    return <label htmlFor="upload-image">
-        <input style={{ display: 'none' }}
-            id="upload-image"
-            name="upload-image"
-            type="file"
-            onChange={handleChange} />
-        <div className="toolbox-button-wrapper">
-            <Button className="toolbox-button" component="span">
-                {children}
-            </Button>
-        </div >
-    </label>
-}
-
-type ToolboxButtonProps = {
-    // onClick: () => void,
-    children: JSX.Element
-}
-
-type ToolboxUploadButtonProps = {
-    onFileChange: (file: string | null) => void,
-    children: JSX.Element
-}
-
-type ToolboxProps = {
-    onImageChange: (img: string | null) => void
 }
