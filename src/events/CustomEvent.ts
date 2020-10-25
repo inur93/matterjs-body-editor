@@ -1,5 +1,6 @@
 
 export enum EventType {
+    SHAPE_ADD_ENABLED,
     SHAPES_CHANGED,
     SHAPE_SELECT,
     SHAPE_ADD,

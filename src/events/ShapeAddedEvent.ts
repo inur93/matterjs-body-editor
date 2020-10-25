@@ -11,3 +11,4 @@ export class ShapeAddedEvent extends CustomEvent {
         this.shape = shape;
     }
 }
+

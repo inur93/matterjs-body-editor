@@ -1,9 +1,8 @@
 import React from 'react';
 import './App.css';
-import { Backdrop } from './components/Backdrop';
 import { Canvas } from './components/Canvas';
 import { useScreenDimensions } from './hooks/useScreenDimensions';
-import { Toolbox } from './Toolbox';
+import { Toolbox } from './components/toolbox/Toolbox';
 
 
 

@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import EventDispatcher from '../events/EventDispatcher';
-import { loadLsJson } from '../helperFunctions';
 import { ImageEvent } from '../events/ImageEvent';
-import { useScale } from './useScale';
+import { loadLsJson } from '../helperFunctions';
 
 
 export const useImage = (): UseImageType => {
@@ -10,7 +9,7 @@ export const useImage = (): UseImageType => {
 
     useEffect(() => {
         return EventDispatcher.subscribe(ImageEvent.type, (evt: ImageEvent) => evt.img !== image && setImage(evt.img));
-    }, [])
+    }, [image])
     const broadCastImage = (newImage: MBE.Image) => {
         setImage(newImage);
         localStorage.setItem('image', JSON.stringify(newImage));

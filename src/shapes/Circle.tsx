@@ -4,6 +4,7 @@ import { KonvaEventObject } from 'konva/types/Node';
 import React, { useEffect } from 'react';
 import { Ellipse as EllipseKonva, Transformer } from 'react-konva';
 import { useShapeColor } from '../hooks/useShapeColor';
+import { Vector2d } from 'konva/types/types';
 
 const handleShapeMove = (onChange: MBE.ShapeOnChange<MBE.Circle>,
     data: MBE.Circle) => (e: KonvaEventObject<Event>) => {
@@ -46,10 +47,10 @@ export const Circle = (props: MBE.CircleProps) => {
     const { rX, rY, x, y } = props.data;
     useEffect(() => {
         if (props.isSelected) {
-            trRef.current?.setNode(shapeRef.current);
+            trRef.current?.nodes([shapeRef.current]);
             trRef.current?.getLayer()?.batchDraw();
         }
-    }, [props.isSelected])
+    }, [props.isSelected, shapeRef, trRef])
 
     return <React.Fragment>
 
@@ -77,13 +78,13 @@ export const Circle = (props: MBE.CircleProps) => {
     </React.Fragment>
 }
 
-Circle.create = (id: string, x: number, y: number): MBE.Circle => {
+Circle.create = (id: string, position: Vector2d): MBE.Circle => {
     return {
         type: 'circle',
         angle: 0,
         id,
-        x,
-        y,
+        x: position.x,
+        y: position.y,
         rX: 50,
         rY: 50
     }

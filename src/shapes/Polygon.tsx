@@ -2,7 +2,7 @@
 import Konva from 'konva';
 import { KonvaEventObject } from 'konva/types/Node';
 import React, { useEffect, useState } from 'react';
-import { Rect, Shape, Text, Transformer } from 'react-konva';
+import { Shape, Transformer } from 'react-konva';
 import { Anchor } from '../components/Anchor';
 import { useShapeColor } from '../hooks/useShapeColor';
 
@@ -63,7 +63,7 @@ export const Polygon = (props: MBE.PolygonProps) => {
             trRef.current?.setNode(shapeRef.current);
             trRef.current?.getLayer()?.batchDraw();
         }
-    }, [props.isSelected])
+    }, [props.isSelected, trRef, shapeRef])
 
     return <React.Fragment>
         <Shape
@@ -92,7 +92,7 @@ export const Polygon = (props: MBE.PolygonProps) => {
 
 
         />
-        <Transformer ref={trRef}  />
+        <Transformer ref={trRef} />
         {props.isSelected && <React.Fragment>
             {vertices.map((v, i) => <Anchor id={`${props.data.id}-${i}`}
                 x={x + v.x}

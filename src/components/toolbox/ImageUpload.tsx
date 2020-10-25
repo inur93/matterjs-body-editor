@@ -1,12 +1,11 @@
+import { Button, Dialog, DialogContent, DialogContentText, DialogTitle, TextField } from "@material-ui/core";
 import React, { useEffect, useState } from 'react';
-import { Button, Dialog, DialogContent, DialogContentText, DialogTitle, Input, Modal, TextField } from "@material-ui/core";
-import { ImageUpload } from "../../icons/Icons";
-import { image2obj } from '../../helperFunctions';
-import EventDispatcher from '../../events/EventDispatcher';
-import { ImageEvent } from '../../events/ImageEvent';
-import { ToolboxButton } from './ToolboxButton';
 import { EventType } from '../../events/CustomEvent';
+import EventDispatcher from '../../events/EventDispatcher';
+import { image2obj } from '../../helperFunctions';
 import { useImage } from '../../hooks/useImage';
+import { ImageUpload } from "../../icons/Icons";
+import { ToolboxButton } from './ToolboxButton';
 
 
 export const ImageUploadButton = () => {

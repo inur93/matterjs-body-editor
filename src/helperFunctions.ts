@@ -9,7 +9,7 @@ export const image2obj = (file: File): Promise<MBE.Image> => {
     const context = canvas.getContext("2d");
 
     const url = URL.createObjectURL(file);
-    const img = new Image;
+    const img = new Image();
 
     let resolve: (data: MBE.Image) => void;
     img.onload = () => {

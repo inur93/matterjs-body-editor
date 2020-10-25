@@ -25,9 +25,6 @@ namespace MBE {
         height: number;
     }
 
-    enum ShapeAction {
-        ADD, REMOVE, UPDATE
-    }
 
 
 
