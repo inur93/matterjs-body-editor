@@ -87,7 +87,6 @@ export const Polygon = (props: MBE.PolygonProps) => {
                 context.fillStrokeShape(shape);
             }}
             onDragEnd={handleShapeMove(props.onChange, props.data)}
-            onClick={() => props.onSelect(props.data.id)}
             onDblClick={handleAddVertice(props.onChange, props.data)}
 
 

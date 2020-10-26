@@ -4,10 +4,9 @@ import App from './App';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 
-
 ReactDOM.render(
   <React.StrictMode>
-    <React.Fragment>
+    <React.Fragment>      
       <App />
     </React.Fragment>
   </React.StrictMode>,

@@ -64,7 +64,7 @@ export const Circle = (props: MBE.CircleProps) => {
             radiusY={rY}
             ref={shapeRef}
             onDragEnd={handleShapeMove(props.onChange, props.data)}
-            onClick={() => props.onSelect(props.data.id)}
+            
             onTransformEnd={handleTransformEnd(shapeRef, props.onChange, props.data)}
         />
 

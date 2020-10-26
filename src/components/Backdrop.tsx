@@ -17,7 +17,7 @@ export const Backdrop = ({ onClick } : BackdropProps) => {
 
     if (!image) return null;
 
-    return <KonvaImage image={image} onClick={onClick} />
+    return <KonvaImage name="backdrop" image={image} onClick={onClick} />
 }
 
 type BackdropProps = {

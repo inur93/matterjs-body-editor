@@ -7,12 +7,12 @@ import { useCallback, useState } from 'react';
 
 const GUIDELINE_OFFSET = 5;
 
-export const useGuides = (): UseGuideType => {
+export const useGuides = (skipSnap: boolean = false): UseGuideType => {
     const [guides, setGuides] = useState<GuideType[]>([]);
-    const [layer, setLayer] = useState<KonvaLayer>();
+    // const [layer, setLayer] = useState<KonvaLayer>();
     const onDrag = useCallback((e: KonvaEventObject<DragEvent>) => {
         const stage = e.target.getStage();
-        if (!layer || !stage) return;
+        if (!stage) return;
 
         // find possible snapping lines
         var lineGuideStops = getLineGuideStops(e.target, stage);
@@ -32,6 +32,7 @@ export const useGuides = (): UseGuideType => {
 
         var absPos = e.target.absolutePosition();
 
+        if (skipSnap) return;
         // now force object position - do the snap
         guides.forEach((lg) => {
             switch (lg.snap) {
@@ -78,12 +79,12 @@ export const useGuides = (): UseGuideType => {
         });
 
         e.target.absolutePosition(absPos);
-    }, [layer, setGuides]);
+    }, [setGuides]);
 
     const onDragEnd = () => {
         setGuides([]);
     }
-    return [guides, onDrag, onDragEnd, setLayer]
+    return [guides, onDrag, onDragEnd]
 }
 
 
@@ -132,6 +133,7 @@ function getObjectSnappingEdges(node: KonvaShape<ShapeConfig> | KonvaStage): Obj
     };
 }
 
+
 // were can we snap our objects?
 function getLineGuideStops(skipShape: KonvaShape<ShapeConfig> | KonvaStage, stage: KonvaStage) {
 
@@ -142,8 +144,10 @@ function getLineGuideStops(skipShape: KonvaShape<ShapeConfig> | KonvaStage, stag
     // and we snap over edges and center of each object on the canvas
     stage.children.each(layer => {
         layer.children.each((guideItem) => {
-            //skip selected shape and other guide shapes
-            if (guideItem === skipShape || guideItem.name() === 'guide') {
+            //skip selected shape, guide shapes and transform shapes
+            if (guideItem === skipShape
+                || guideItem.name() === 'guide'
+                || guideItem.name() === 'transform') {
                 return;
             }
             var box = guideItem.getClientRect();
@@ -223,8 +227,7 @@ function getGuides(lineGuideStops: LineStopsType, itemBounds: ObjectSnappingEdge
 type UseGuideType = [
     GuideType[],
     (e: KonvaEventObject<DragEvent>) => void,
-    (e: KonvaEventObject<DragEvent>) => void,
-    (layer: KonvaLayer) => void
+    (e: KonvaEventObject<DragEvent>) => void
 ]
 
 type LineStopsType = {

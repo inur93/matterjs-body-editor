@@ -1,10 +1,3 @@
-
-
-
-
-
-
-
 type Vector = {
     x: number,
     y: number
@@ -43,7 +36,7 @@ namespace MBE {
         props: ShapeComponentProps<T>
     }
     interface ShapeComponentProps<T extends Shape> {
-        onSelect: (id: string) => void,
+        // onSelect: (id: string) => void,
         onChange: ShapeOnChange<T>,
         isSelected: boolean,
         data: T
