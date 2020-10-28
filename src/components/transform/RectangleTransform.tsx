@@ -94,13 +94,13 @@ export const RectangleTransform = ({ node }: TransformProps) => {
             }
         });
 
-        node.setAbsolutePosition(absPos);
+        // node.setAbsolutePosition(absPos);
 
-        node.scaleX(dims.scaleX);
-        node.scale({
-            x: dims.scaleX,
-            y: dims.scaleY
-        })
+        // node.scaleX(dims.scaleX);
+        // node.scale({
+        //     x: dims.scaleX,
+        //     y: dims.scaleY
+        // })
         // node.scale({ x: dims.scaleX, y: dims.scaleY });
     }
 
@@ -120,7 +120,6 @@ export const RectangleTransform = ({ node }: TransformProps) => {
             ignoreStroke
             onTransformStart={onTransformStart}
             onTransformEnd={onTransformEnd}
-            onTransform={handleDrag}
             boundBoxFunc={(oldbox, newbox) => {
                 if (newbox.width < 5 || newbox.height < 5) {
                     return oldbox;

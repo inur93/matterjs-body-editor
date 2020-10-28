@@ -1,24 +1,24 @@
 
 import { KonvaEventObject, Node, NodeConfig } from 'konva/types/Node';
 import { Vector2d } from 'konva/types/types';
-import React, { useEffect, useState } from 'react';
+import { posix } from 'path';
+import React, { useState } from 'react';
 import { Layer, Line, Stage } from 'react-konva';
-import EventDispatcher from '../events/EventDispatcher';
 import { ShapeAddEnabledEvent } from '../events/ShapeAddEnabledEvent';
 import { ToggleDragEvent } from '../events/ToggleDragEvent';
+import { useEventSubscriber } from '../hooks/useEventSubscriber';
 import { useGuides } from '../hooks/useGuides';
 import { useKeyDownListener } from '../hooks/useKeyDownListener';
 import useKeyListener from '../hooks/useKeyListener';
 import { useScreenDimensions } from '../hooks/useScreenDimensions';
 import { ShapeAction, useShapes } from '../hooks/useShapes';
 import { useViewport } from '../hooks/useViewport';
+import { Backdrop } from './Backdrop';
 import { Circle } from './shapes/Circle';
 import { Polygon } from './shapes/Polygon';
 import { Rectangle } from './shapes/Rectangle';
-import { Backdrop } from './Backdrop';
 import { Guide } from './transform/Guide';
 import { RectangleTransform } from './transform/RectangleTransform';
-import { useEventSubscriber } from '../hooks/useEventSubscriber';
 
 
 
@@ -30,7 +30,7 @@ export const Canvas = () => {
     const [drag, setDrag] = useState(false);
     const [guides, onDrag, onDragEnd] = useGuides();
     const [ctrlDown] = useKeyDownListener('Control');
-    const [currentShapePosition, setCurrentShapePosition] = useState<Vector2d>();
+    // const [currentShapePosition, setCurrentShapePosition] = useState<Vector2d>();
     const [trNode, setTrNode] = useState<Node<NodeConfig>>();
 
     useKeyListener('Delete', () => {
@@ -94,6 +94,24 @@ export const Canvas = () => {
     }
 
     return (<Stage className="canvas" width={dimensions.width} height={dimensions.height}
+        dragBoundFunc={(pos: Vector2d) => {
+            //TODO get map dimensions
+            const width = 640*viewport.scale.x;
+            const height = 640*viewport.scale.y;
+
+            const x_min = Math.min(dimensions.width-width, 0);
+            const x_max = Math.max(dimensions.width-width, 0);
+           
+            const y_min = Math.min(dimensions.height-height, 0);
+            const y_max = Math.max(dimensions.height-height, 0);
+
+            if(pos.x < x_min) pos.x = x_min;
+            else if(pos.x > x_max) pos.x = x_max;
+            
+            if(pos.y < y_min) pos.y = y_min;
+            else if(pos.y > y_max) pos.y = y_max;
+            return pos;
+        }}
         draggable={drag}
         onDragEnd={vpActions.onPanEnd}
         onMouseDown={checkDeselect}
