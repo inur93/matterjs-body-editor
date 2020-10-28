@@ -1,14 +1,9 @@
-type Vector = {
-    x: number,
-    y: number
-}
-
 type ToolboxSettings = {
     x: number,
     y: number
 }
 
-namespace MBE {
+declare namespace MBE {
     type EventListener = (...params: any[]) => void;
     type DisposeListener = () => void;
     type Image = {
@@ -61,4 +56,34 @@ namespace MBE {
     interface RectangleProps extends ShapeComponentProps<Rectangle> { }
     interface PolygonProps extends ShapeComponentProps<Polygon> { }
     interface CircleProps extends ShapeComponentProps<Circle> { }
+
+    type LineStopsType = {
+        vertical: Set<number>,
+        horizontal: Set<number>
+    }
+
+    type ObjectSnappingEdgesType = {
+        vertical: SnappingEdgeType[],
+        horizontal: SnappingEdgeType[]
+    }
+
+    type SnappingEdgeType = {
+        guide: number,
+        offset: number,
+        snap: string
+    }
+
+    type GuideStopType = {
+        lineGuide: number,
+        diff: number,
+        snap: string,
+        offset: number,
+    }
+
+    type GuideType = {
+        lineGuide: number,
+        offset: number,
+        orientation: 'V' | 'H',
+        snap: string,
+    }
 }

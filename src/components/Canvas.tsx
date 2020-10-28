@@ -1,25 +1,24 @@
 
-import { Layer as KonvaLayer } from 'konva/types/Layer';
 import { KonvaEventObject, Node, NodeConfig } from 'konva/types/Node';
-import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
-import { Layer, Line, Stage, Text } from 'react-konva';
+import { Vector2d } from 'konva/types/types';
+import React, { useEffect, useState } from 'react';
+import { Layer, Line, Stage } from 'react-konva';
 import EventDispatcher from '../events/EventDispatcher';
 import { ShapeAddEnabledEvent } from '../events/ShapeAddEnabledEvent';
 import { ToggleDragEvent } from '../events/ToggleDragEvent';
 import { useGuides } from '../hooks/useGuides';
+import { useKeyDownListener } from '../hooks/useKeyDownListener';
+import useKeyListener from '../hooks/useKeyListener';
 import { useScreenDimensions } from '../hooks/useScreenDimensions';
 import { ShapeAction, useShapes } from '../hooks/useShapes';
 import { useViewport } from '../hooks/useViewport';
-import { Circle } from '../shapes/Circle';
-import { Polygon } from '../shapes/Polygon';
-import { Rectangle } from '../shapes/Rectangle';
+import { Circle } from './shapes/Circle';
+import { Polygon } from './shapes/Polygon';
+import { Rectangle } from './shapes/Rectangle';
 import { Backdrop } from './Backdrop';
-import { useKeyDownListener } from '../hooks/useKeyDownListener';
-import useKeyListener from '../hooks/useKeyListener';
-import { TestApp } from './Test';
-import { RectangleTransform } from './RectangleTransform';
-import Konva from 'konva';
-import { Vector2d } from 'konva/types/types';
+import { Guide } from './transform/Guide';
+import { RectangleTransform } from './transform/RectangleTransform';
+import { useEventSubscriber } from '../hooks/useEventSubscriber';
 
 
 
@@ -33,35 +32,25 @@ export const Canvas = () => {
     const [ctrlDown] = useKeyDownListener('Control');
     const [currentShapePosition, setCurrentShapePosition] = useState<Vector2d>();
     const [trNode, setTrNode] = useState<Node<NodeConfig>>();
+
     useKeyListener('Delete', () => {
         shapes.filter(x => selectedShapes.includes(x.id))
             .forEach(s => shapeActions.updateShape(ShapeAction.REMOVE, s));
         setTrNode(undefined);
     });
 
-    const toggleDragListener = (evt: ToggleDragEvent) => {
+    useEventSubscriber(ToggleDragEvent.type, (evt: ToggleDragEvent) => {
         setDrag(evt.enabled);
-    }
+    }, [setDrag]);
 
-    const setShapeToAddListener = (evt: ShapeAddEnabledEvent) => {
+    useEventSubscriber(ShapeAddEnabledEvent.type, (evt: ShapeAddEnabledEvent) => {
         setShapeToAdd(evt.shapeType);
-    }
-
-    useEffect(() => {
-        const diposers = [
-            // EventDispatcher.subscribe(ShapeSelectedEvent.type, selectedShapeListener),
-            EventDispatcher.subscribe(ToggleDragEvent.type, toggleDragListener),
-            EventDispatcher.subscribe(ShapeAddEnabledEvent.type, setShapeToAddListener)
-        ]
-
-        return () => diposers.forEach(x => x());
-    }, []);
+    }, [setShapeToAdd]);
 
     const onCanvasClick = (evt: KonvaEventObject<MouseEvent>) => {
         var transform = evt.target.getAbsoluteTransform().copy();
         // to detect relative position we need to invert transform
         transform.invert();
-
 
         // get pointer (say mouse or touch) position
         const absolutePosition = evt.target.getStage()?.getPointerPosition() || { x: 0, y: 0 };
@@ -118,47 +107,24 @@ export const Canvas = () => {
             <Backdrop onClick={checkDeselect} />
         </Layer>
         <Grid stagePos={viewport.offset} scale={viewport.scale} dimensions={dimensions} />
-        <Layer onDragMove={e => {
-            onDrag(e);
-            // setCurrentShapePosition(e.target.getPosition());
-        }} onDragEnd={onDragEnd} onClick={selectShape}>
-            {(shapes || []).map((x, i) => <Component key={x.id}
-                data={x}
-                props={{
-                    data: x,
-                    isSelected: selectedShapes.includes(x.id),
-                    onChange: onShapeChange
-                }
-                }
-            />)}
+        <Layer onDragMove={onDrag} onDragEnd={onDragEnd} onClick={selectShape}>
+            {(shapes || []).map((x, i) => (
+                <Component
+                    key={x.id}
+                    data={x}
+                    props={{
+                        data: x,
+                        isSelected: selectedShapes.includes(x.id),
+                        onChange: onShapeChange
+                    }
+                    }
+                />))}
 
         </Layer>
         <Layer>
-            <Text
-                x={viewport.offset.x / viewport.scale.y}
-                y={(viewport.offset.y + dimensions.height) / viewport.scale.y - 30}
-                stroke="black"
-                strokeWidth={1}
-                text={`(${Math.round(currentShapePosition?.x || 0)},${Math.round(currentShapePosition?.y || 0)})`}
-            />
             <RectangleTransform node={trNode} />
             {
-                (guides || []).map((guide) => {
-                    const baseProps = {
-                        key: guide.orientation,
-                        name: 'guide',
-                        stroke: 'rgb(0, 161, 255)',
-                        strokeWidth: 1,
-                        dash: [4, 6]
-                    }
-                    if (guide.orientation === 'H') {
-                        return <Line {...baseProps} y={(guide.lineGuide - viewport.offset.y) * 1 / viewport.scale.y} points={[-6000, 0, 6000, 0]} />
-                    } else if (guide.orientation === 'V') {
-                        return <Line {...baseProps} x={(guide.lineGuide - viewport.offset.x) * 1 / viewport.scale.x} points={[0, -6000, 0, 6000]} />
-                    } else {
-                        return null;
-                    }
-                })
+                (guides || []).map((guide) => <Guide guide={guide} scale={viewport.scale} offset={viewport.offset} />)
             }
         </Layer>
     </Stage>)

@@ -1,10 +1,8 @@
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 import React, { useState } from 'react';
-import { EventType } from '../../events/CustomEvent';
 import EventDispatcher from "../../events/EventDispatcher";
-import { Hand } from '../../icons/Icons';
-import { ToolboxButton } from "./ToolboxButton"
 import { ToggleDragEvent } from '../../events/ToggleDragEvent';
+import { Hand } from '../../icons/Icons';
 
 
 export const DragButton = () => {

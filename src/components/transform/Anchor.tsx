@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Rect, Text } from 'react-konva';
 import { KonvaEventObject } from 'konva/types/Node';
+import { Vector2d } from 'konva/types/types';
 
 
 export const Anchor = ({ id, x, y, labelText, onDrag }: AnchorProps) => {
@@ -37,5 +38,5 @@ type AnchorProps = {
     x: number,
     y: number,
     labelText: string,
-    onDrag: (position: Vector) => void
+    onDrag: (position: Vector2d) => void
 }

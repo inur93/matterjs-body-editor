@@ -1,12 +1,10 @@
 import Konva from 'konva';
-import { NodeConfig, Node, KonvaEventObject } from 'konva/types/Node';
-import React, { useEffect, useState } from 'react';
-import { Line, Transformer } from 'react-konva';
-import { useGuides } from '../hooks/useGuides';
-import { useViewport } from '../hooks/useViewport';
-import { Layer as KonvaLayer } from 'konva/types/Layer';
-import { Shape as KonvaShape, ShapeConfig } from 'konva/types/Shape';
+import { KonvaEventObject, Node, NodeConfig } from 'konva/types/Node';
 import { Stage as KonvaStage } from 'konva/types/Stage';
+import React, { useEffect, useState } from 'react';
+import { Transformer } from 'react-konva';
+import { useViewport } from '../../hooks/useViewport';
+import { Guide } from './Guide';
 
 
 const GUIDELINE_OFFSET = 5;
@@ -24,15 +22,6 @@ export const RectangleTransform = ({ node }: TransformProps) => {
 
     const handleDrag = (e: KonvaEventObject<DragEvent>) => {
         const node = e.target;
-
-        // console.log('test', {
-        //     x: node.x(),
-        //     y: node.y(),
-        //     width: node.width(),
-        //     height: node.height(),
-        //     scale: node.scaleX()
-        // })
-
         const stage = trRef.current.getStage();
         if (!stage) return;
 
@@ -57,7 +46,7 @@ export const RectangleTransform = ({ node }: TransformProps) => {
                 case 'start': {
                     switch (lg.orientation) {
                         case 'V': {
-                            
+
                             const newWidth = dims.width * dims.scaleX;
 
 
@@ -71,7 +60,7 @@ export const RectangleTransform = ({ node }: TransformProps) => {
                                 // newX: newX,
                                 // width: dims.width*dims.scaleX,
                                 // newWidth: newScaleX * dims.width,
-                                dw: dims.width*dims.scaleX - newScaleX * dims.width,
+                                dw: dims.width * dims.scaleX - newScaleX * dims.width,
                                 dx: absPos.x - newX,
                                 // scaleX: dims.scaleX,
                                 // newScaleX: newScaleX
@@ -93,14 +82,10 @@ export const RectangleTransform = ({ node }: TransformProps) => {
                     switch (lg.orientation) {
                         case 'V': {
                             dims.scaleX = (dims.width * dims.scaleX + lg.lineGuide + lg.offset - absPos.x) / dims.width;
-
-                            console.log('end V', dims.scaleX);
-                            // newbox.width = (nodeRect.width + lg.lineGuide + lg.offset - nodeRect.x);
                             break;
                         }
                         case 'H': {
                             dims.scaleY = (dims.height * dims.scaleY + lg.lineGuide + lg.offset - absPos.y) / dims.height;
-                            // newbox.height = (nodeRect.height + lg.lineGuide + lg.offset - nodeRect.y);
                             break;
                         }
                     }
@@ -110,7 +95,7 @@ export const RectangleTransform = ({ node }: TransformProps) => {
         });
 
         node.setAbsolutePosition(absPos);
-        
+
         node.scaleX(dims.scaleX);
         node.scale({
             x: dims.scaleX,
@@ -120,13 +105,12 @@ export const RectangleTransform = ({ node }: TransformProps) => {
     }
 
     const onTransformEnd = (e: KonvaEventObject<Event>) => {
-        e.currentTarget?.setDraggable(true);
+        node?.setDraggable(true);
         setGuides([]);
     }
 
     const onTransformStart = (e: KonvaEventObject<Event>) => {
-        e.target.setDraggable(false);
-
+        node?.setDraggable(false);
     }
 
     return <React.Fragment>
@@ -151,22 +135,7 @@ export const RectangleTransform = ({ node }: TransformProps) => {
             }}
         />
         {
-            (guides || []).map((guide) => {
-                const baseProps = {
-                    key: guide.orientation,
-                    name: 'guide',
-                    stroke: 'rgb(0, 161, 255)',
-                    strokeWidth: 1,
-                    dash: [4, 6]
-                }
-                if (guide.orientation === 'H') {
-                    return <Line {...baseProps} y={(guide.lineGuide - viewport.offset.y) * 1 / viewport.scale.y} points={[-6000, 0, 6000, 0]} />
-                } else if (guide.orientation === 'V') {
-                    return <Line {...baseProps} x={(guide.lineGuide - viewport.offset.x) * 1 / viewport.scale.x} points={[0, -6000, 0, 6000]} />
-                } else {
-                    return null;
-                }
-            })
+            (guides || []).map((guide) => <Guide guide={guide} offset={viewport.offset} scale={viewport.scale} />)
         }
     </React.Fragment>
 }
@@ -287,16 +256,6 @@ function getLineGuideStops(skipShape: Node<NodeConfig> | KonvaStage, stage: Konv
         horizontal: new Set(horizontal.flat()),
     };
 }
-
-
-
-type SnapPoints = 'left' | 'top' | 'right' | 'bottom';
-
-type UseGuideType = [
-    GuideType[],
-    (e: KonvaEventObject<DragEvent>) => void,
-    (e: KonvaEventObject<DragEvent>) => void
-]
 
 type LineStopsType = {
     vertical: Set<number>,

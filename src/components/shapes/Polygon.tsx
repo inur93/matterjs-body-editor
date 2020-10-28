@@ -3,11 +3,12 @@ import Konva from 'konva';
 import { KonvaEventObject } from 'konva/types/Node';
 import React, { useEffect, useState } from 'react';
 import { Shape, Transformer } from 'react-konva';
-import { Anchor } from '../components/Anchor';
-import { useShapeColor } from '../hooks/useShapeColor';
+import { Anchor } from '../transform/Anchor';
+import { useShapeColor } from '../../hooks/useShapeColor';
+import { Vector2d } from 'konva/types/types';
 
 //https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
-const dist = (p1: Vector, p2: Vector, d: Vector) => {
+const dist = (p1: Vector2d, p2: Vector2d, d: Vector2d) => {
     return Math.abs((p2.y - p1.y) * d.x - (p2.x - p1.x) * d.y + p2.x * p1.y - p2.y * p1.x)
         / Math.sqrt(Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2))
 }
@@ -42,7 +43,7 @@ const handleShapeMove = (onChange: MBE.ShapeOnChange<MBE.Polygon>, data: MBE.Pol
 
 const handleAnchorChange = (onChange: MBE.ShapeOnChange<MBE.Polygon>, data: MBE.Polygon, index: number,
     setLabel: React.Dispatch<React.SetStateAction<[number, number]>>) =>
-    (position: Vector) => {
+    (position: Vector2d) => {
 
         setLabel([position.x + 20 + 5, position.y + 5]);
 

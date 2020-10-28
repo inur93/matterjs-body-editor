@@ -3,7 +3,7 @@ import Konva from 'konva';
 import { KonvaEventObject } from 'konva/types/Node';
 import React, { useEffect } from 'react';
 import { Ellipse as EllipseKonva, Transformer } from 'react-konva';
-import { useShapeColor } from '../hooks/useShapeColor';
+import { useShapeColor } from '../../hooks/useShapeColor';
 import { Vector2d } from 'konva/types/types';
 
 const handleShapeMove = (onChange: MBE.ShapeOnChange<MBE.Circle>,

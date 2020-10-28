@@ -1,5 +1,4 @@
 
-import { Layer as KonvaLayer } from 'konva/types/Layer';
 import { KonvaEventObject } from 'konva/types/Node';
 import { Shape as KonvaShape, ShapeConfig } from 'konva/types/Shape';
 import { Stage as KonvaStage } from 'konva/types/Stage';
@@ -8,7 +7,7 @@ import { useCallback, useState } from 'react';
 const GUIDELINE_OFFSET = 5;
 
 export const useGuides = (skipSnap: boolean = false): UseGuideType => {
-    const [guides, setGuides] = useState<GuideType[]>([]);
+    const [guides, setGuides] = useState<MBE.GuideType[]>([]);
     // const [layer, setLayer] = useState<KonvaLayer>();
     const onDrag = useCallback((e: KonvaEventObject<DragEvent>) => {
         const stage = e.target.getStage();
@@ -22,12 +21,14 @@ export const useGuides = (skipSnap: boolean = false): UseGuideType => {
         // now find where can we snap current object
         var guides = getGuides(lineGuideStops, itemBounds);
 
-        // do nothing of no snapping
+        // do nothing if no snapping
         if (!guides.length) {
             return;
         }
 
-        // drawGuides(guides);
+        console.clear();
+        console.table(guides);
+
         setGuides(guides);
 
         var absPos = e.target.absolutePosition();
@@ -35,51 +36,22 @@ export const useGuides = (skipSnap: boolean = false): UseGuideType => {
         if (skipSnap) return;
         // now force object position - do the snap
         guides.forEach((lg) => {
-            switch (lg.snap) {
-                case 'start': {
-                    switch (lg.orientation) {
-                        case 'V': {
-                            absPos.x = lg.lineGuide + lg.offset;
-                            break;
-                        }
-                        case 'H': {
-                            absPos.y = lg.lineGuide + lg.offset;
-                            break;
-                        }
-                    }
+
+            switch (lg.orientation) {
+                case 'V': {
+                    absPos.x = lg.lineGuide + lg.offset;
                     break;
                 }
-                case 'center': {
-                    switch (lg.orientation) {
-                        case 'V': {
-                            absPos.x = lg.lineGuide + lg.offset;
-                            break;
-                        }
-                        case 'H': {
-                            absPos.y = lg.lineGuide + lg.offset;
-                            break;
-                        }
-                    }
+                case 'H': {
+                    absPos.y = lg.lineGuide + lg.offset;
                     break;
                 }
-                case 'end': {
-                    switch (lg.orientation) {
-                        case 'V': {
-                            absPos.x = lg.lineGuide + lg.offset;
-                            break;
-                        }
-                        case 'H': {
-                            absPos.y = lg.lineGuide + lg.offset;
-                            break;
-                        }
-                    }
-                    break;
-                }
+                default: break;
             }
         });
 
         e.target.absolutePosition(absPos);
-    }, [setGuides]);
+    }, [setGuides, skipSnap]);
 
     const onDragEnd = () => {
         setGuides([]);
@@ -91,7 +63,7 @@ export const useGuides = (skipSnap: boolean = false): UseGuideType => {
 // what points of the object will trigger to snapping?
 // it can be just center of the object
 // but we will enable all edges and center
-function getObjectSnappingEdges(node: KonvaShape<ShapeConfig> | KonvaStage): ObjectSnappingEdgesType {
+function getObjectSnappingEdges(node: KonvaShape<ShapeConfig> | KonvaStage): MBE.ObjectSnappingEdgesType {
     const box = node.getClientRect();
     const absPos = node.absolutePosition();
 
@@ -138,8 +110,8 @@ function getObjectSnappingEdges(node: KonvaShape<ShapeConfig> | KonvaStage): Obj
 function getLineGuideStops(skipShape: KonvaShape<ShapeConfig> | KonvaStage, stage: KonvaStage) {
 
     // we can snap to stage borders and the center of the stage
-    const vertical = [[0, stage.width() / 2, stage.width()]];
-    const horizontal = [[0, stage.height() / 2, stage.height()]];
+    const vertical = [[0, stage.width()]];
+    const horizontal = [[0, stage.height()]];
 
     // and we snap over edges and center of each object on the canvas
     stage.children.each(layer => {
@@ -165,9 +137,9 @@ function getLineGuideStops(skipShape: KonvaShape<ShapeConfig> | KonvaStage, stag
 }
 
 
-function getGuides(lineGuideStops: LineStopsType, itemBounds: ObjectSnappingEdgesType): GuideType[] {
-    var resultV: GuideStopType[] = [];
-    var resultH: GuideStopType[] = [];
+function getGuides(lineGuideStops: MBE.LineStopsType, itemBounds: MBE.ObjectSnappingEdgesType): MBE.GuideType[] {
+    var resultV: MBE.GuideStopType[] = [];
+    var resultH: MBE.GuideStopType[] = [];
 
     lineGuideStops.vertical.forEach((lineGuide) => {
         itemBounds.vertical.forEach((itemBound) => {
@@ -198,7 +170,7 @@ function getGuides(lineGuideStops: LineStopsType, itemBounds: ObjectSnappingEdge
         });
     });
 
-    var guides: GuideType[] = [];
+    var guides: MBE.GuideType[] = [];
 
     // find closest snap
     var minV = resultV.sort((a, b) => a.diff - b.diff)[0];
@@ -224,38 +196,9 @@ function getGuides(lineGuideStops: LineStopsType, itemBounds: ObjectSnappingEdge
 }
 
 
+
 type UseGuideType = [
-    GuideType[],
+    MBE.GuideType[],
     (e: KonvaEventObject<DragEvent>) => void,
     (e: KonvaEventObject<DragEvent>) => void
 ]
-
-type LineStopsType = {
-    vertical: Set<number>,
-    horizontal: Set<number>
-}
-
-type ObjectSnappingEdgesType = {
-    vertical: SnappingEdgeType[],
-    horizontal: SnappingEdgeType[]
-}
-
-type SnappingEdgeType = {
-    guide: number,
-    offset: number,
-    snap: string
-}
-
-type GuideStopType = {
-    lineGuide: number,
-    diff: number,
-    snap: string,
-    offset: number,
-}
-
-type GuideType = {
-    lineGuide: number,
-    offset: number,
-    orientation: 'V' | 'H',
-    snap: string,
-}

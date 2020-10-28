@@ -1,10 +1,9 @@
 import Konva from 'konva';
 import { KonvaEventObject } from 'konva/types/Node';
 import { Vector2d } from 'konva/types/types';
-import React, { useEffect } from 'react';
-import { Rect, Transformer } from 'react-konva';
-import { useGuides } from '../hooks/useGuides';
-import { useShapeColor } from '../hooks/useShapeColor';
+import React from 'react';
+import { Rect } from 'react-konva';
+import { useShapeColor } from '../../hooks/useShapeColor';
 
 
 const handleTransformEnd = (ref: React.MutableRefObject<Konva.Rect>,

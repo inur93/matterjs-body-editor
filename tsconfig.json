@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "outDir": "./dist",
+    "target": "es5",
+    "typeRoots": ["./types.d.ts"],
     "lib": [
       "dom",
       "dom.iterable",
@@ -14,6 +14,7 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
+    "downlevelIteration": true, //allows using fx [...Set<number>]
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
     "moduleResolution": "node",
@@ -22,7 +23,5 @@
     "noEmit": true,
     "jsx": "react"
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }
