@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { Image as KonvaImage } from 'react-konva';
 import { useImage } from "../hooks/useImage";
 
-export const Backdrop = ({ onClick } : BackdropProps) => {
+
+export const Backdrop = ({ onClick }: BackdropProps) => {
     const [imgData] = useImage();
     const [image, setImage] = useState<HTMLImageElement>();
 

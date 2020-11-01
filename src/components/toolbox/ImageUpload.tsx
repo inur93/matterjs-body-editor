@@ -1,11 +1,12 @@
 import { Button, Dialog, DialogContent, DialogContentText, DialogTitle, TextField } from "@material-ui/core";
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { EventType } from '../../events/CustomEvent';
 import EventDispatcher from '../../events/EventDispatcher';
 import { image2obj } from '../../helperFunctions';
+import { useEventSubscriber } from '../../hooks/useEventSubscriber';
 import { useImage } from '../../hooks/useImage';
 import { ImageUpload } from "../../icons/Icons";
-import { ToolboxButton } from './ToolboxButton';
+import ToolboxButton from './ToolboxButton';
 
 
 export const ImageUploadButton = () => {
@@ -23,11 +24,9 @@ export const ImageUploadModal = () => {
     const [height, setHeight] = useState(0);
     const [, setSelectedImage] = useImage();
     const [uploadedImage, setUploadedImage] = useState<MBE.Image>();
-
-    const listener = () => {
+    useEventSubscriber(EventType.SHOW_IMAGE_UPLOAD, () => {
         setVisible(true);
-    }
-    useEffect(() => EventDispatcher.subscribe(EventType.SHOW_IMAGE_UPLOAD, listener), []);
+    });
 
     const selectImage = () => {
         if (uploadedImage) {

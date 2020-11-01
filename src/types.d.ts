@@ -1,6 +1,8 @@
 type ToolboxSettings = {
-    x: number,
-    y: number
+    position: {
+        x: number,
+        y: number
+    }
 }
 
 declare namespace MBE {
@@ -19,7 +21,26 @@ declare namespace MBE {
     type DragType = 'start' | 'end' | 'move';
 
     type ShapeType = 'line' | 'rectangle' | 'polygon' | 'circle';
+    type BodyType = 'dynamic' | 'static';
+
+    type ShapeProperties = {
+        label: string,
+        bodyType: BodyType,
+        isPlatform: boolean,
+        isStatic: boolean,
+        inertia: Number,
+        mass: Number, // only if not static
+        density: Number, // changes mass automatically if set
+        friction: Number, // between 0 and 1
+        frictionAir: Number, // 
+        frictionStatic: Number, // static friction of the body (in the Coulomb friction model)
+        isSensor: boolean,
+        isSleeping: boolean,
+
+
+    }
     interface Shape {
+        properties: ShapeProperties;
         type: ShapeType;
         id: string;
         x: number;

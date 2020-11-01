@@ -1,7 +1,7 @@
 
+import { createStyles, makeStyles, Theme } from '@material-ui/core';
 import { KonvaEventObject, Node, NodeConfig } from 'konva/types/Node';
 import { Vector2d } from 'konva/types/types';
-import { posix } from 'path';
 import React, { useState } from 'react';
 import { Layer, Line, Stage } from 'react-konva';
 import { ShapeAddEnabledEvent } from '../events/ShapeAddEnabledEvent';
@@ -21,8 +21,17 @@ import { Guide } from './transform/Guide';
 import { RectangleTransform } from './transform/RectangleTransform';
 
 
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        "root": {
+            "z-index": 1033,
+            position: "absolute"
+        }
+    }),
+);
 
-export const Canvas = () => {
+export default function Canvas() {
+    const classes = useStyles();
     const [dimensions] = useScreenDimensions();
     const [shapeToAdd, setShapeToAdd] = useState<string | undefined>();
     const [shapes, selectedShapes, shapeActions] = useShapes();
@@ -41,11 +50,11 @@ export const Canvas = () => {
 
     useEventSubscriber(ToggleDragEvent.type, (evt: ToggleDragEvent) => {
         setDrag(evt.enabled);
-    }, [setDrag]);
+    });
 
     useEventSubscriber(ShapeAddEnabledEvent.type, (evt: ShapeAddEnabledEvent) => {
         setShapeToAdd(evt.shapeType);
-    }, [setShapeToAdd]);
+    });
 
     const onCanvasClick = (evt: KonvaEventObject<MouseEvent>) => {
         var transform = evt.target.getAbsoluteTransform().copy();
@@ -93,23 +102,23 @@ export const Canvas = () => {
 
     }
 
-    return (<Stage className="canvas" width={dimensions.width} height={dimensions.height}
+    return (<Stage className={classes.root} width={dimensions.width} height={dimensions.height}
         dragBoundFunc={(pos: Vector2d) => {
             //TODO get map dimensions
-            const width = 640*viewport.scale.x;
-            const height = 640*viewport.scale.y;
+            const width = 640 * viewport.scale.x;
+            const height = 640 * viewport.scale.y;
 
-            const x_min = Math.min(dimensions.width-width, 0);
-            const x_max = Math.max(dimensions.width-width, 0);
-           
-            const y_min = Math.min(dimensions.height-height, 0);
-            const y_max = Math.max(dimensions.height-height, 0);
+            const x_min = Math.min(dimensions.width - width, 0);
+            const x_max = Math.max(dimensions.width - width, 0);
 
-            if(pos.x < x_min) pos.x = x_min;
-            else if(pos.x > x_max) pos.x = x_max;
-            
-            if(pos.y < y_min) pos.y = y_min;
-            else if(pos.y > y_max) pos.y = y_max;
+            const y_min = Math.min(dimensions.height - height, 0);
+            const y_max = Math.max(dimensions.height - height, 0);
+
+            if (pos.x < x_min) pos.x = x_min;
+            else if (pos.x > x_max) pos.x = x_max;
+
+            if (pos.y < y_min) pos.y = y_min;
+            else if (pos.y > y_max) pos.y = y_max;
             return pos;
         }}
         draggable={drag}

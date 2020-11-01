@@ -1,28 +1,21 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { EventType } from "../events/CustomEvent";
 import EventDispatcher from "../events/EventDispatcher";
-import { loadLsJson } from "../helperFunctions";
-import { ShapesChangedEvent } from '../events/ShapesChangedEvent';
 import { ShapeAddedEvent } from '../events/ShapeAddedEvent';
+import { ShapesChangedEvent } from '../events/ShapesChangedEvent';
+import { useEventSubscriber } from './useEventSubscriber';
+import { useLocalStorage } from './useLocalStorage';
 
 export enum ShapeAction {
     ADD, REMOVE, UPDATE
 }
 
 export const useShapes = (): UseShapesType => {
-    const [shapes, setShapes] = useState<MBE.Shape[]>(loadLsJson<MBE.Shape[]>('shapes') || []);
+    const [shapes, setShapes] = useLocalStorage<MBE.Shape[]>('shapes', []);
     const [selectedShapes, setSelectedShapes] = useState<string[]>([]);
 
-    const listener = (evt: ShapesChangedEvent) => {
-        setShapes(evt.shapes);
-    }
+    useEventSubscriber(EventType.SHAPES_CHANGED, (evt: ShapesChangedEvent) => setShapes(evt.shapes));
 
-    useEffect(() => {
-        return EventDispatcher.subscribe(ShapesChangedEvent.type, listener);
-    }, []);
-
-    useEffect(() => {
-        localStorage.setItem('shapes', JSON.stringify(shapes));
-    }, [shapes])
     const updateShape = (action: ShapeAction, shape: MBE.Shape) => {
         let updated;
         switch (action) {

@@ -37,10 +37,14 @@ export const loadLsNumber = (key: string): number => {
     if (Number.isNaN(number)) return 0;
     return number;
 }
-export const loadLsJson = <T>(key: string): T | undefined => {
+
+export function loadLsJson<T>(key: string, defaultValue?: T): T;
+export function loadLsJson<T = undefined>(key: string, defaultValue?: T): T;
+
+export function loadLsJson<T>(key: string, defaultValue?: T): T {
     const value = localStorage.getItem(key);
     try {
         if (value) return JSON.parse(value);
     } catch (e) { }
-    return undefined;
+    return defaultValue as T;
 }

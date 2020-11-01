@@ -1,7 +1,7 @@
 import { Vector2d } from "konva/types/types";
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export const useDrag = <M extends HTMLElement, A extends HTMLElement>(position: Vector2d): UseDragType<M, A> => {
+export const useDrag = <M extends HTMLElement, A extends HTMLElement>(position: Vector2d, callback?: (position: Vector2d) => void): UseDragType<M, A> => {
     const [movingElement, setMovingElement] = useState<M>();
     const [anchor, setAnchor] = useState<A>();
     const [x, setX] = useState(position.x);
@@ -30,8 +30,9 @@ export const useDrag = <M extends HTMLElement, A extends HTMLElement>(position: 
         document.removeEventListener('mousemove', _mouseMove);
         document.removeEventListener('mouseup', _mouseUp);
         setMoving(false);
+        if (callback) callback({ x, y });
         event.preventDefault();
-    }, [_mouseMove, setMoving]);
+    }, [_mouseMove, setMoving, x, y, callback]);
 
     const _mouseDown = useCallback((event: MouseEvent) => {
 

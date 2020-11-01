@@ -1,18 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import EventDispatcher from '../events/EventDispatcher';
 import { ImageEvent } from '../events/ImageEvent';
-import { loadLsJson } from '../helperFunctions';
+import { useLocalStorage } from './useLocalStorage';
 
 
 export const useImage = (): UseImageType => {
-    const [image, setImage] = useState<MBE.Image | undefined>(loadLsJson<MBE.Image>('image'));
+    const [image, setImage] = useLocalStorage<MBE.Image>('image');
 
     useEffect(() => {
-        return EventDispatcher.subscribe(ImageEvent.type, (evt: ImageEvent) => evt.img !== image && setImage(evt.img));
-    }, [image])
+        return EventDispatcher.subscribe(ImageEvent.type, (evt: ImageEvent) => setImage(evt.img));
+    }, [setImage]);
+
     const broadCastImage = (newImage: MBE.Image) => {
-        setImage(newImage);
-        localStorage.setItem('image', JSON.stringify(newImage));
         EventDispatcher.dispatch(new ImageEvent(newImage));
     }
 

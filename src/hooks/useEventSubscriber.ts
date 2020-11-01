@@ -4,7 +4,7 @@ import EventDispatcher from "../events/EventDispatcher";
 
 
 
-export const useEventSubscriber = (type: EventType, listener: (e: any) => void, dependencies: React.DependencyList) => {
-
+export const useEventSubscriber = (type: EventType, listener: (e: any) => void) => {
+    
     useEffect(() => EventDispatcher.subscribe(type, listener), [type, listener]);
 }

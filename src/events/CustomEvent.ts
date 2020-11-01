@@ -10,7 +10,8 @@ export enum EventType {
     COLOR_CHANGE,
     IMAGE_EVENT,
     SHOW_IMAGE_UPLOAD,
-    TOGGLE_DRAG
+    TOGGLE_DRAG,
+    LOCAL_STORAGE_KEY_CHANGED_EVENT
 };
 export abstract class CustomEvent {
     type: EventType;

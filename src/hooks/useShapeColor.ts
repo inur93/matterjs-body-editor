@@ -1,20 +1,17 @@
-import { useEffect, useState } from "react";
 import { ColorChangeEvent } from "../events/ColorChangeEvent";
+import { EventType } from "../events/CustomEvent";
 import EventDispatcher from "../events/EventDispatcher";
+import { useEventSubscriber } from './useEventSubscriber';
+import { useLocalStorage } from './useLocalStorage';
 
 
-export const useShapeColor = () : UseShapeColorType => {
-    const [color, setShapeColor] = useState(localStorage.getItem('color') || '#00000');
+export const useShapeColor = (): UseShapeColorType => {
+    const [color, setShapeColor] = useLocalStorage('color', '#00000');
 
-    const colorChangeListener = (evt: ColorChangeEvent) => setShapeColor(evt.color);
-
-    useEffect(() => {
-        return EventDispatcher.subscribe(ColorChangeEvent.type, colorChangeListener)
-    }, []);
+    useEventSubscriber(EventType.COLOR_CHANGE, (evt: ColorChangeEvent) => setShapeColor(evt.color));
 
     const broadcastColor = (col: string) => {
         EventDispatcher.dispatch(new ColorChangeEvent(col));
-        localStorage.setItem('color', col);
     }
     return [color, broadcastColor];
 }

@@ -1,43 +1,34 @@
+import { KonvaEventObject } from 'konva/types/Node';
 import { Vector2d } from "konva/types/types";
-import { useEffect, useState } from "react";
 import { CanvasZoomEvent } from '../events/CanvasZoomEvent';
 import { EventType } from "../events/CustomEvent";
 import EventDispatcher from "../events/EventDispatcher";
-import { loadLsNumber, loadLsJson } from '../helperFunctions';
-import { KonvaEventObject } from 'konva/types/Node';
+import { useEventSubscriber } from './useEventSubscriber';
+import { useLocalStorage } from './useLocalStorage';
 
 export const useViewport = (): UseViewportType => {
-    const [scale, setScale] = useState(loadLsNumber('vp-scale') || 1);
-    const [offset, setOffset] = useState(loadLsJson<Vector2d>('vp-offset') || { x: 0, y: 0 });
+    const [scale, setScale] = useLocalStorage('vp-scale', { x: 1, y: 1 });
+    const [offset, setOffset] = useLocalStorage('vp-offset', { x: 0, y: 0 });
 
-    useEffect(() => {
-        const disposers = [
-            EventDispatcher.subscribe(EventType.CANVAS_ZOOM, (evt: CanvasZoomEvent) => setScale(evt.scale))
-        ]
-        return () => disposers.forEach(x => x());
-    });
+    useEventSubscriber(EventType.CANVAS_ZOOM, (evt: CanvasZoomEvent) => setScale({ x: evt.scale, y: evt.scale }));
+
     const updateScale = (diff: number) => {
-        const newVal = diff / 2000 + scale;
-        if (newVal < 0.5) return;
+        const newVal = diff / 2000 + scale.x;
+        //TODO limit could be made as a ratio of screen size and map size.
+        if (newVal < 0.5) return; // no reason scale further down
 
-        localStorage.setItem('vp-scale', `${newVal}`);
         EventDispatcher.dispatch(new CanvasZoomEvent(newVal));
     }
 
     const onPanEnd = (e: KonvaEventObject<DragEvent>) => {
         if (e.target === e.target.getStage()) {
             const offset = e.target.position();
-            console.log('offset', offset);
-            // localStorage.setItem('vp-offset', JSON.stringify(offset));
             setOffset(offset);
         }
     }
 
     return [{
-        scale: {
-            x: scale,
-            y: scale
-        },
+        scale,
         offset
     }, {
         updateScale,

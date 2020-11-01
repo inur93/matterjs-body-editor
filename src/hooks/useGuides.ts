@@ -123,7 +123,6 @@ function getLineGuideStops(skipShape: KonvaShape<ShapeConfig> | KonvaStage, stag
                 return;
             }
             var box = guideItem.getClientRect();
-            // console.log('data', {box});
             // and we can snap to all edges of shapes
             vertical.push([box.x, box.x + box.width, box.x + box.width / 2]);
             horizontal.push([box.y, box.y + box.height, box.y + box.height / 2]);
@@ -176,7 +175,6 @@ function getGuides(lineGuideStops: MBE.LineStopsType, itemBounds: MBE.ObjectSnap
     var minV = resultV.sort((a, b) => a.diff - b.diff)[0];
     var minH = resultH.sort((a, b) => a.diff - b.diff)[0];
     if (minV) {
-        console.log('minv', minV.lineGuide);
         guides.push({
             lineGuide: minV.lineGuide,
             offset: minV.offset,

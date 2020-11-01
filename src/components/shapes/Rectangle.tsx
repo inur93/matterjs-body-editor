@@ -21,7 +21,6 @@ const handleTransformEnd = (ref: React.MutableRefObject<Konva.Rect>,
         // we will reset it back
         node.scaleX(1);
         node.scaleY(1);
-        console.log('node', node.toJSON());
         onChange({
             ...data,
             x: Math.round(node.x()),
@@ -48,7 +47,6 @@ export const Rectangle = (props: MBE.RectangleProps) => {
     const x = props.data.x;
     const y = props.data.y;
 
-    console.log('dimensions', { x, y, width, height });
     return <React.Fragment>
         <Rect
             name={props.data.id}
