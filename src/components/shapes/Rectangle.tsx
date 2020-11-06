@@ -1,7 +1,7 @@
 import Konva from 'konva';
 import { KonvaEventObject } from 'konva/types/Node';
 import { Vector2d } from 'konva/types/types';
-import React from 'react';
+import React, { memo } from 'react';
 import { Rect } from 'react-konva';
 import { useShapeColor } from '../../hooks/useShapeColor';
 
@@ -38,7 +38,7 @@ const handleDragEnd = (onChange: MBE.ShapeOnChange<MBE.Rectangle>, data: MBE.Rec
         y: Math.round(e.target.y())
     })
 }
-export const Rectangle = (props: MBE.RectangleProps) => {
+export function Rectangle(props: MBE.RectangleProps) {
     const shapeRef = React.useRef<Konva.Rect>() as React.MutableRefObject<Konva.Rect>;
 
     const [color] = useShapeColor();
@@ -62,6 +62,8 @@ export const Rectangle = (props: MBE.RectangleProps) => {
     </React.Fragment>
 }
 
+const PureRectangle = memo(Rectangle);
+
 Rectangle.create = (id: string, position: Vector2d): MBE.Rectangle => {
     return {
         type: 'rectangle',
@@ -69,6 +71,9 @@ Rectangle.create = (id: string, position: Vector2d): MBE.Rectangle => {
         x: position.x,
         y: position.y,
         width: 50,
-        height: 50
+        height: 50,
+        properties: {}
     }
 }
+
+export default PureRectangle;

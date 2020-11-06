@@ -15,32 +15,55 @@ declare namespace MBE {
         height: number;
     }
 
+    type Dimensions = {
+        width: number,
+        height: number
+    }
 
 
 
     type DragType = 'start' | 'end' | 'move';
 
     type ShapeType = 'line' | 'rectangle' | 'polygon' | 'circle';
-    type BodyType = 'dynamic' | 'static';
 
-    type ShapeProperties = {
+    type PropertyFieldType = 'string' | 'boolean' | 'number';
+    type PropertyFieldValue = string | boolean | number | undefined;
+    type PropertyField = PropertyFieldGeneric<string>
+        | PropertyFieldGeneric<boolean>
+        | PropertyFieldGeneric<number>
+
+    type PropertyFieldGeneric<V extends PropertyFieldValue> = {
         label: string,
-        bodyType: BodyType,
-        isPlatform: boolean,
-        isStatic: boolean,
-        inertia: Number,
-        mass: Number, // only if not static
-        density: Number, // changes mass automatically if set
-        friction: Number, // between 0 and 1
-        frictionAir: Number, // 
-        frictionStatic: Number, // static friction of the body (in the Coulomb friction model)
-        isSensor: boolean,
-        isSleeping: boolean,
+        type: PropertyFieldType,
+        name: keyof BodyProperties,
+        defaultValue: V
+    }
+    type StringFields = 'label';
+    type BooleanFields = 'isPlatform' | 'isStatic' | 'isSensor' | 'isSleeping';
+    type NumberFields = 'inertia' | 'mass' | 'density';
+    type AnyField = StringFields | BooleanFields | NumberFields;
 
-
+    type KeyOfType<O, T> = {
+        [K in keyof O]: T
+    }
+    type BodyProperties = {
+        // [key: StringFields]: string,
+        // [key: BooleanFields]: boolean,
+        // [key: NumberFields]: number
+        label?: string,
+        isPlatform?: boolean,
+        isStatic?: boolean,
+        isSensor?: boolean,
+        isSleeping?: boolean,
+        inertia?: number,
+        mass?: number, // only if not static
+        density?: number, // changes mass automatically if set
+        friction?: number, // between 0 and 1
+        frictionAir?: number, // 
+        frictionStatic?: number // static friction of the body (in the Coulomb friction model)
     }
     interface Shape {
-        properties: ShapeProperties;
+        properties: BodyProperties;
         type: ShapeType;
         id: string;
         x: number;

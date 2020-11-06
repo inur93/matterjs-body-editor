@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Vector2d } from 'konva/types/types';
 import { Line } from 'react-konva';
 
 
-export const Guide = ({ guide, offset, scale }: GuideProps) => {
+function Guide({ guide, offset, scale }: GuideProps) {
     const baseProps = {
         key: guide.orientation,
         name: 'guide',
@@ -18,6 +18,8 @@ export const Guide = ({ guide, offset, scale }: GuideProps) => {
         return <Line {...baseProps} x={(guide.lineGuide - offset.x) * 1 / scale.x} />
     }
 }
+
+export default memo(Guide);
 
 type GuideProps = {
     guide: MBE.GuideType,

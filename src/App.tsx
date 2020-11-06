@@ -1,8 +1,9 @@
-import React from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core';
+import React from 'react';
 import Canvas from './components/Canvas';
+import { FloatingPropertiesWindow } from './components/properties/PropertiesWindow';
+import { FloatingToolbox } from './components/toolbox/Toolbox';
 import { useScreenDimensions } from './hooks/useScreenDimensions';
-import Toolbox from './components/toolbox/Toolbox';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -22,7 +23,8 @@ function App() {
   const [dimensions] = useScreenDimensions();
 
   return (<div className={classes.root} style={dimensions.styles}>
-    <Toolbox />
+    <FloatingToolbox />
+    <FloatingPropertiesWindow />
     <Canvas />
   </div>
   );

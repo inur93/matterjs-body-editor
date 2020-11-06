@@ -86,6 +86,9 @@ Circle.create = (id: string, position: Vector2d): MBE.Circle => {
         x: position.x,
         y: position.y,
         rX: 50,
-        rY: 50
+        rY: 50,
+        properties: {
+            
+        }
     }
 }

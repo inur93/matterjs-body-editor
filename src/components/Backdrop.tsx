@@ -1,10 +1,10 @@
 import { KonvaEventObject } from 'konva/types/Node';
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { Image as KonvaImage } from 'react-konva';
 import { useImage } from "../hooks/useImage";
 
 
-export const Backdrop = ({ onClick }: BackdropProps) => {
+function Backdrop({ onClick }: BackdropProps) {
     const [imgData] = useImage();
     const [image, setImage] = useState<HTMLImageElement>();
 
@@ -20,6 +20,8 @@ export const Backdrop = ({ onClick }: BackdropProps) => {
 
     return <KonvaImage name="backdrop" image={image} onClick={onClick} />
 }
+
+export default memo(Backdrop);
 
 type BackdropProps = {
     onClick: (e: KonvaEventObject<MouseEvent | TouchEvent>) => void

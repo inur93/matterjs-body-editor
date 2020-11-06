@@ -26,8 +26,8 @@ export const useGuides = (skipSnap: boolean = false): UseGuideType => {
             return;
         }
 
-        console.clear();
-        console.table(guides);
+        // console.clear();
+        // console.table(guides);
 
         setGuides(guides);
 
@@ -124,8 +124,16 @@ function getLineGuideStops(skipShape: KonvaShape<ShapeConfig> | KonvaStage, stag
             }
             var box = guideItem.getClientRect();
             // and we can snap to all edges of shapes
-            vertical.push([box.x, box.x + box.width, box.x + box.width / 2]);
-            horizontal.push([box.y, box.y + box.height, box.y + box.height / 2]);
+            vertical.push([
+                box.x, //start
+                box.x + box.width, //end
+                // box.x + box.width / 2 // center
+            ]);
+            horizontal.push([
+                box.y, // start
+                box.y + box.height, // end
+                // box.y + box.height / 2 // center
+            ]);
         })
     })
 

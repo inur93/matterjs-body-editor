@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { EventType } from '../events/CustomEvent';
 import EventDispatcher from '../events/EventDispatcher';
 import { loadLsJson } from '../helperFunctions';
@@ -16,10 +16,10 @@ export function useLocalStorage<T>(key: string, defaultValue?: T): UseLocalStora
         setData(loadLsJson<T>(key, defaultValue));
     });
 
-    const update = (d: T) => {
+    const update = useCallback(function broadcastData(d: T) {
         localStorage.setItem(key, JSON.stringify(d));
         EventDispatcher.dispatchEmptyEvent(EventType.LOCAL_STORAGE_KEY_CHANGED_EVENT);
-    }
+    }, [key]);
 
     return [data, update];
 }

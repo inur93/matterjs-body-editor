@@ -1,15 +1,15 @@
 import Konva from 'konva';
 import { KonvaEventObject, Node, NodeConfig } from 'konva/types/Node';
 import { Stage as KonvaStage } from 'konva/types/Stage';
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { Transformer } from 'react-konva';
 import { useViewport } from '../../hooks/useViewport';
-import { Guide } from './Guide';
+import Guide from './Guide';
 
 
 const GUIDELINE_OFFSET = 5;
 
-export const RectangleTransform = ({ node }: TransformProps) => {
+function RectangleTransform({ node }: TransformProps) {
     const trRef = React.useRef<Konva.Transformer>() as React.MutableRefObject<Konva.Transformer>;
     const [guides, setGuides] = useState<GuideType[]>([]);
     const [viewport] = useViewport();
@@ -138,6 +138,8 @@ export const RectangleTransform = ({ node }: TransformProps) => {
         }
     </React.Fragment>
 }
+
+export default memo(RectangleTransform);
 
 type TransformProps = {
     node?: Node<NodeConfig>
